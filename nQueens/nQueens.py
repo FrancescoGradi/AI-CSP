@@ -1,7 +1,7 @@
 import random
 import numpy as np
 import matplotlib.pyplot as plt
-
+import matplotlib.image as mpimg
 
 class Problem:
 
@@ -56,6 +56,17 @@ class Problem:
         plt.figure(1, figsize=(w, h))
         tb = plt.table(cellText=matrix, loc=(0, 0), cellLoc='center')
 
+        for i in range(n):
+            for j in range(n):
+                if self.x[i] == j:
+                    tb._cells[(i, j)]._text.set_color('red')
+                    tb._cells[(i, j)]._text.set_weight('extra bold')
+                if ((i + j) % 2) == 0:
+                    tb._cells[(i, j)].set_facecolor("#A3A3A3")
+                else:
+                    tb._cells[(i, j)].set_facecolor("#FAD87B")
+
+
         tc = tb.properties()['child_artists']
         for cell in tc:
             cell.set_height(1.0 / n)
@@ -82,6 +93,7 @@ def minConflicts(problem, maxSteps):
 
 def minConflictsRandomRestart(problem, maxSteps, maxRestarts, count=0):
     current = problem.x
+
     for i in range(maxSteps):
         if isSolution(current):
             return current, i, count
@@ -232,6 +244,7 @@ def countDiagonalConflicts(matrix, j, current, var):
 n = 8
 p = Problem(n)
 p.setRandomX()
+p.drawQueens()
 
 print "Initial random assignment: "
 print
