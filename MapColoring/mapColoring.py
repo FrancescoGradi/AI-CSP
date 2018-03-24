@@ -2,7 +2,7 @@ import random
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
-import planarity
+from scipy.spatial import Delaunay
 
 class Map:
     def __init__(self):
@@ -21,11 +21,9 @@ class Map:
             for neighbor in region.neighbors:
                 g.add_edge(region.name, neighbor.name)
 
-        nx.draw_networkx_nodes(g, pos, node_color=colors, node_size=1000)
-        nx.draw_networkx_labels(g, pos, font_size=14)
+        nx.draw_networkx_nodes(g, pos, node_color=colors, node_size=100)
+        nx.draw_networkx_labels(g, pos, font_size=4)
         nx.draw_networkx_edges(g, pos)
-
-        print planarity.is_planar(g)
 
         plt.show()
 
@@ -90,18 +88,34 @@ def getAustraliaMap():
 
     return map
 
-def getRandomMap(n):
-
+def getRandomMap(n, nDomains):
     map = Map()
-    for i in range(n):
+    for i in range(nDomains):
         map.domains.append('#' + "%06x" % random.randint(0, 0xFFFFFF))
 
     # Inserisco n nodi a caso dentro la mappa
+    points = list()
+    nodes = list()
     for i in range(n):
         map.regions.append(Region("R" + str(i), posX=float(random.random()), posY=float(random.random())))
+        points.append((map.regions[i].posX, map.regions[i].posY))
+        nodes.append(map.regions[i])
 
-    #for i in range(n):
-    #   map.regions.neighbors.append(map.regions(random.randint(0, len(map.regions) - 1)))
+    # Applico algoritmo di Delaunay per assegnare archi che non si intersechino fra loro, resistuisce una lista
+    # di archi che rispetta questa proprieta', puo' essere usata quindi per generare archi casuali
+
+    t = Delaunay(points)
+    edges = []
+    m = dict(enumerate(nodes))
+
+    for i in range(t.nsimplex):
+        edges.append((m[t.vertices[i, 0]], m[t.vertices[i, 1]]))
+        edges.append((m[t.vertices[i, 1]], m[t.vertices[i, 2]]))
+        edges.append((m[t.vertices[i, 2]], m[t.vertices[i, 0]]))
+
+    for i in range(len(edges)):
+        edges[i][0].neighbors.append(edges[i][1])
+        edges[i][1].neighbors.append(edges[i][0])
 
     return map
 
@@ -155,10 +169,23 @@ def conflicts(current, var):
 
     return minima[random.randint(0, len(minima) - 1)]
 
-map = getRandomMap(100)
+map = getRandomMap(100, 10)
 randomAssignment(map)
 map.drawMap()
 
+solution = minConflicts(map, 10000)
+
+if solution is 0:
+    print "Solution not found"
+else:
+    for i in range(len(solution[0].regions)):
+        print solution[0].regions[i].name + ": " + solution[0].regions[i].color
+
+    map.drawMap()
+
+
+
+'''
 map = getAustraliaMap()
 
 solution = minConflicts(map, 10000)
@@ -171,3 +198,4 @@ else:
 
     map.drawMap()
 
+'''
