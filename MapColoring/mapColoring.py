@@ -2,6 +2,7 @@ import random
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
+import pylab as pl
 from scipy.spatial import Delaunay
 
 class Map:
@@ -11,18 +12,24 @@ class Map:
 
     def drawMap(self):
         g = nx.Graph()
-        colors = list()
+        colorsRegions = list()
         pos = dict()
         for region in self.regions:
-            colors.append(region.color)
+            colorsRegions.append((region.name, region.color))
             pos[region.name] = [region.posX, region.posY]
             if len(region.neighbors) == 0:
                 g.add_edge(region.name, region.name)
             for neighbor in region.neighbors:
                 g.add_edge(region.name, neighbor.name)
 
+        colors = list()
+        for node in g.nodes:
+            for i in range(len(g.nodes)):
+                if node is colorsRegions[i][0]:
+                    colors.append(colorsRegions[i][1])
+
         nx.draw_networkx_nodes(g, pos, node_color=colors, node_size=100)
-        nx.draw_networkx_labels(g, pos, font_size=4)
+        nx.draw_networkx_labels(g, pos, font_size=2)
         nx.draw_networkx_edges(g, pos)
 
         plt.show()
@@ -75,8 +82,6 @@ def getAustraliaMap():
     NSW.neighbors.append(SA)
     V.neighbors.append(SA)
     V.neighbors.append(NSW)
-    V.neighbors.append(NT)
-    NT.neighbors.append(V)
 
     map.regions.append(WA)
     map.regions.append(Q)
@@ -114,8 +119,10 @@ def getRandomMap(n, nDomains):
         edges.append((m[t.vertices[i, 2]], m[t.vertices[i, 0]]))
 
     for i in range(len(edges)):
-        edges[i][0].neighbors.append(edges[i][1])
-        edges[i][1].neighbors.append(edges[i][0])
+        if edges[i][1] not in edges[i][0].neighbors:
+            edges[i][0].neighbors.append(edges[i][1])
+        if edges[i][0] not in edges[i][1].neighbors:
+            edges[i][1].neighbors.append(edges[i][0])
 
     return map
 
@@ -169,11 +176,10 @@ def conflicts(current, var):
 
     return minima[random.randint(0, len(minima) - 1)]
 
-map = getRandomMap(100, 10)
-randomAssignment(map)
-map.drawMap()
 
-solution = minConflicts(map, 10000)
+map = getRandomMap(4800, 9)
+
+solution = minConflicts(map, 100000)
 
 if solution is 0:
     print "Solution not found"
@@ -183,9 +189,8 @@ else:
 
     map.drawMap()
 
-
-
 '''
+
 map = getAustraliaMap()
 
 solution = minConflicts(map, 10000)
@@ -194,7 +199,7 @@ if solution is 0:
     print "Solution not found"
 else:
     for i in range(len(solution[0].regions)):
-        print solution[0].regions[i].name + ": " + solution[0].regions[i].color
+        print solution[0].regions[i].name + ": " + str(solution[0].regions[i].color)
 
     map.drawMap()
 
