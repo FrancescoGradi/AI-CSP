@@ -1,12 +1,11 @@
 import random
 import numpy as np
+from timeit import default_timer as timer
 import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 
 class Problem:
 
     def __init__(self, n):
-
         # x rappresenta l'indice di colonna, tutte le righe sono diverse per definizione
 
         self.n = n
@@ -22,25 +21,22 @@ class Problem:
             self.matrix[i][self.x[i]] = 1
 
     def getMatrix(self):
-
         self.matrix = np.zeros((len(self.x), len(self.x)))
+
         for i in range(len(self.x)):
             self.matrix[i][self.x[i]] = 1
 
         return self.matrix
 
     def setRandomX(self):
-
         for i in range(len(self.x)):
             self.x[i] = random.randint(0, len(self.x) - 1)
 
     def setX(self, current):
-
         for i in range(len(self.x)):
             self.x[i] = current[i]
 
     def drawQueens(self):
-
         matrix = np.zeros((n, n))
         matrix = matrix.astype(str)
 
@@ -59,12 +55,12 @@ class Problem:
         for i in range(n):
             for j in range(n):
                 if self.x[i] == j:
-                    tb._cells[(i, j)]._text.set_color('red')
+                    tb._cells[(i, j)]._text.set_color('#960018')
                     tb._cells[(i, j)]._text.set_weight('extra bold')
                 if ((i + j) % 2) == 0:
-                    tb._cells[(i, j)].set_facecolor("#A3A3A3")
+                    tb._cells[(i, j)].set_facecolor("#CD853F")
                 else:
-                    tb._cells[(i, j)].set_facecolor("#FAD87B")
+                    tb._cells[(i, j)].set_facecolor("#FADFAD")
 
 
         tc = tb.properties()['child_artists']
@@ -132,6 +128,14 @@ def isSolution(problem):
     # Dobbiamo verificare che tutte le colonne siano diverse, abbiano indici diversi
     # Per avere colonne tutte diverse non deve mai entrare nell'if
 
+    # Verifica veloce per risparmiare tempo: se la somma degli indici di colonna e' diversa da n*(n+1)/2, dalla formula
+    # di Gauss, allora non e' soluzione, altrimenti verifica
+
+    n = len(problem) - 1
+
+    if sum(problem) != (n * (n + 1) / 2):
+        return False
+
     for i in range(len(problem)):
         tmp = problem[i]
         for j in range(i + 1, len(problem)):
@@ -148,12 +152,8 @@ def isSolution(problem):
 
     for k in range((len(matrix[0]) * 2) - 1):
         diagonal = np.diagonal(matrix, k - (len(matrix[0]) - 1))
-        flag = False
-        for i in range(len(diagonal)):
-            if diagonal[i]:
-                if flag:
-                    return False
-                flag = True
+        if sum(diagonal) > 1:
+            return False
 
     # Analizzo ciascuna antidiagonale e guardo che non ci siano due 1 in una diagonale
 
@@ -161,12 +161,8 @@ def isSolution(problem):
 
     for k in range((len(matrix[0]) * 2) - 1):
         antidiagonal = np.diagonal(matrix, k - (len(matrix[0]) - 1))
-        flag = False
-        for i in range(len(antidiagonal)):
-            if antidiagonal[i]:
-                if flag:
-                    return False
-                flag = True
+        if sum(antidiagonal) > 1:
+            return False
 
     return True
 
@@ -241,10 +237,10 @@ def countDiagonalConflicts(matrix, j, current, var):
     return count
 
 
-n = 8
+n = 128
 p = Problem(n)
 p.setRandomX()
-p.drawQueens()
+#p.drawQueens()
 
 print "Initial random assignment: "
 print
@@ -274,19 +270,26 @@ else:
 
 # Min Conflicts using Random Restart
 
-
+'''
 steps = 10000
 restarts = 15
+
+start = timer()
+
 current = minConflictsRandomRestart(p, steps, restarts)
 
+end = timer()
+
+print sum(current[0])
+
 if current is 0:
-    print "Solution not found in " + str(steps) + " steps and " + str(restarts) + " random restarts"
+    print "Solution not found in " + str(steps) + " steps, " + str(end - start) + " seconds and " + str(restarts) + " random restarts"
 else:
-    print "I found a solution in " + str(current[1]) + " steps and " + str(current[2]) + " random restarts"
+    print "I found a solution in " + str(current[1]) + " steps, " + str(end - start) + " seconds and " + str(current[2]) + " random restarts"
     print
     print p.getMatrix()
 
-    p.drawQueens()
+    #p.drawQueens()
 
 
 # Min Conflicts using Simulated Annealing
@@ -294,14 +297,19 @@ else:
 '''
 steps = 100000
 temperature = 5
+
+start = timer()
+
 current = minConflictsSimulatedAnnealing(p, steps, temperature)
 
+end = timer()
+
 if current is 0:
-    print "Solution not found in " + str(steps) + " steps"
+    print "Solution not found in " + str(steps) + " steps, " + str(end - start) + " seconds"
 else:
-    print "I found a solution in " + str(current[1]) + " steps"
+    print "I found a solution in " + str(current[1]) + " steps, " + str(end - start) + " seconds"
     print
     print p.getMatrix()
 
-    p.drawQueens()
-'''
+    #p.drawQueens()
+

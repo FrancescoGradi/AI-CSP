@@ -51,6 +51,7 @@ class Region:
 
 
 def getAustraliaMap():
+    # Funzione che genera un grafo che replica la mappa dell'Australia, dall'esempio del Russell-Norvig
 
     map = Map()
     for i in range(3):
@@ -177,7 +178,7 @@ def conflicts(current, var):
     return minima[random.randint(0, len(minima) - 1)]
 
 
-map = getRandomMap(4800, 9)
+map = getRandomMap(128, 6)
 
 solution = minConflicts(map, 100000)
 

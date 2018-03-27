@@ -1,2 +1,2 @@
 # AI-CSP
-Map coloring and n-queens problems with min-conflicts heuristic
+Map Coloring and n-Queens problems with Min-Conflicts Heuristic
