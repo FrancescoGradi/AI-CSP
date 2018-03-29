@@ -1,6 +1,5 @@
 import random
 import numpy as np
-from timeit import default_timer as timer
 import matplotlib.pyplot as plt
 
 class Problem:
@@ -37,11 +36,11 @@ class Problem:
             self.x[i] = current[i]
 
     def drawQueens(self):
-        matrix = np.zeros((n, n))
+        matrix = np.zeros((self.n, self.n))
         matrix = matrix.astype(str)
 
-        for i in range(n):
-            for j in range(n):
+        for i in range(self.n):
+            for j in range(self.n):
                 if self.x[i] == j:
                     matrix[i][j] = 'Q'
                 else:
@@ -52,8 +51,8 @@ class Problem:
         plt.figure(1, figsize=(w, h))
         tb = plt.table(cellText=matrix, loc=(0, 0), cellLoc='center')
 
-        for i in range(n):
-            for j in range(n):
+        for i in range(self.n):
+            for j in range(self.n):
                 if self.x[i] == j:
                     tb._cells[(i, j)]._text.set_color('#960018')
                     tb._cells[(i, j)]._text.set_weight('extra bold')
@@ -65,8 +64,8 @@ class Problem:
 
         tc = tb.properties()['child_artists']
         for cell in tc:
-            cell.set_height(1.0 / n)
-            cell.set_width(1.0 / n)
+            cell.set_height(1.0 / self.n)
+            cell.set_width(1.0 / self.n)
 
         ax = plt.gca()
         ax.set_xticks([])
@@ -235,81 +234,3 @@ def countDiagonalConflicts(matrix, j, current, var):
             count += 1
 
     return count
-
-
-n = 128
-p = Problem(n)
-p.setRandomX()
-#p.drawQueens()
-
-print "Initial random assignment: "
-print
-print p.x
-
-print
-
-print "Running MinConflicts heuristic: "
-
-print
-
-# Min Conflicts
-
-'''
-steps = 100000
-current = minConflicts(p, steps)
-
-if current is 0:
-    print "Solution not found in " + str(steps) + " steps"
-else:
-    print "I found a solution in " + str(current[1]) + " steps"
-    print
-    print p.getMatrix()
-
-    p.drawQueens()
-'''
-
-# Min Conflicts using Random Restart
-
-'''
-steps = 10000
-restarts = 15
-
-start = timer()
-
-current = minConflictsRandomRestart(p, steps, restarts)
-
-end = timer()
-
-print sum(current[0])
-
-if current is 0:
-    print "Solution not found in " + str(steps) + " steps, " + str(end - start) + " seconds and " + str(restarts) + " random restarts"
-else:
-    print "I found a solution in " + str(current[1]) + " steps, " + str(end - start) + " seconds and " + str(current[2]) + " random restarts"
-    print
-    print p.getMatrix()
-
-    #p.drawQueens()
-
-
-# Min Conflicts using Simulated Annealing
-
-'''
-steps = 100000
-temperature = 5
-
-start = timer()
-
-current = minConflictsSimulatedAnnealing(p, steps, temperature)
-
-end = timer()
-
-if current is 0:
-    print "Solution not found in " + str(steps) + " steps, " + str(end - start) + " seconds"
-else:
-    print "I found a solution in " + str(current[1]) + " steps, " + str(end - start) + " seconds"
-    print
-    print p.getMatrix()
-
-    #p.drawQueens()
-
