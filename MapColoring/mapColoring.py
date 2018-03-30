@@ -34,6 +34,30 @@ class Map:
 
         plt.show()
 
+    def drawBiggerNodesMap(self):
+        g = nx.Graph()
+        colorsRegions = list()
+        pos = dict()
+        for region in self.regions:
+            colorsRegions.append((region.name, region.color))
+            pos[region.name] = [region.posX, region.posY]
+            if len(region.neighbors) == 0:
+                g.add_edge(region.name, region.name)
+            for neighbor in region.neighbors:
+                g.add_edge(region.name, neighbor.name)
+
+        colors = list()
+        for node in g.nodes:
+            for i in range(len(g.nodes)):
+                if node is colorsRegions[i][0]:
+                    colors.append(colorsRegions[i][1])
+
+        nx.draw_networkx_nodes(g, pos, node_color=colors, node_size=1000)
+        nx.draw_networkx_labels(g, pos, font_size=14)
+        nx.draw_networkx_edges(g, pos)
+
+        plt.show()
+
 
 class Region:
     def __init__(self, name=None, color=None, posX=0.0, posY=0.0):
@@ -128,14 +152,13 @@ def getRandomMap(n, nDomains):
     return map
 
 def minConflicts(problem, maxSteps):
-    current = problem
-    randomAssignment(current)
+    randomAssignment(problem)
 
     for i in range(maxSteps):
-        if isSolution(current):
-            return current, i
-        var = chooseVar(current)
-        value = conflicts(current, var)
+        if isSolution(problem):
+            return problem, i
+        var = chooseVar(problem)
+        value = conflicts(problem, var)
         var.color = problem.domains[value]
 
     return 0
@@ -176,32 +199,3 @@ def conflicts(current, var):
             minima.append(k)
 
     return minima[random.randint(0, len(minima) - 1)]
-
-
-map = getRandomMap(128, 6)
-
-solution = minConflicts(map, 100000)
-
-if solution is 0:
-    print "Solution not found"
-else:
-    for i in range(len(solution[0].regions)):
-        print solution[0].regions[i].name + ": " + solution[0].regions[i].color
-
-    map.drawMap()
-
-'''
-
-map = getAustraliaMap()
-
-solution = minConflicts(map, 10000)
-
-if solution is 0:
-    print "Solution not found"
-else:
-    for i in range(len(solution[0].regions)):
-        print solution[0].regions[i].name + ": " + str(solution[0].regions[i].color)
-
-    map.drawMap()
-
-'''
