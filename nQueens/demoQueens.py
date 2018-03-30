@@ -1,9 +1,9 @@
 import nQueens as nq
 from timeit import default_timer as timer
 
-n = 16
+n = 8
 p = nq.Problem(n)
-p.setRandomX()
+p.setMinConflictsRandomX()
 #p.drawQueens()
 
 print "Initial random assignment: "
@@ -16,23 +16,30 @@ print "Running MinConflicts heuristic: "
 
 print
 
-'''
+
 
 # Min Conflicts
 
 steps = 100000
+
+start = timer()
+
 current = nq.minConflicts(p, steps)
 
+end = timer()
+
 if current is 0:
-    print "Solution not found in " + str(steps) + " steps"
+    print "Solution not found in " + str(steps) + " steps and " + str(end - start) + " seconds"
 else:
-    print "I found a solution in " + str(current[1]) + " steps"
+    print "I found a solution in " + str(current[1]) + " steps " + str(end - start) + " seconds"
+    print
+    print p.x
     print
     print p.getMatrix()
 
-    p.drawQueens()
+    #p.drawQueens()
 
-
+'''
 
 # Min Conflicts using Random Restart
 
@@ -46,8 +53,6 @@ current = nq.minConflictsRandomRestart(p, steps, restarts)
 
 end = timer()
 
-print sum(current[0])
-
 if current is 0:
     print "Solution not found in " + str(steps) + " steps, " + str(end - start) + " seconds and " + str(restarts) + " random restarts"
 else:
@@ -57,7 +62,7 @@ else:
 
     #p.drawQueens()
 
-'''
+
 
 # Min Conflicts using Simulated Annealing
 
@@ -79,4 +84,4 @@ else:
     print p.getMatrix()
 
     p.drawQueens()
-
+'''

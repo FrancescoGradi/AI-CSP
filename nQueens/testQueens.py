@@ -3,8 +3,8 @@ import numpy as np
 from timeit import default_timer as timer
 import matplotlib.pyplot as plt
 
-n = [8, 16, 32, 64]
-k = 20
+n = [8, 16, 32, 128]
+k = 10
 steps = 10000
 
 # Time test and step test in max 10000 steps
@@ -27,7 +27,7 @@ for i in range(len(n)):
     for j in range(k):
         p = nq.Problem(n[i])
 
-        p.setRandomX()
+        p.setMinConflictsRandomX()
 
         start = timer()
 

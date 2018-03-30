@@ -5,12 +5,12 @@ import matplotlib.pyplot as plt
 class Problem:
 
     def __init__(self, n):
-        # x rappresenta l'indice di colonna, tutte le righe sono diverse per definizione
+        # x[i] rappresenta l'indice di colonna, tutte le righe sono diverse per definizione
 
         self.n = n
         self.x = range(n)
 
-        # Questa e' una soluzione
+        # Questa e' una soluzione per n = 4
         # self.x = [1, 3, 0, 2]
 
         # rappresentazione matriciale del problema, 1 corrisponde a una Queen
@@ -20,20 +20,58 @@ class Problem:
             self.matrix[i][self.x[i]] = 1
 
     def getMatrix(self):
-        self.matrix = np.zeros((len(self.x), len(self.x)))
-
-        for i in range(len(self.x)):
-            self.matrix[i][self.x[i]] = 1
-
         return self.matrix
 
     def setRandomX(self):
         for i in range(len(self.x)):
+            tmp = self.x[i]
             self.x[i] = random.randint(0, len(self.x) - 1)
+            self.matrix[i][tmp] = 0
+            self.matrix[i][self.x[i]] = 1
 
-    def setX(self, current):
-        for i in range(len(self.x)):
-            self.x[i] = current[i]
+    def setMinConflictsRandomX(self):
+        # Assegno il primo valore casualmente
+        self.matrix = np.zeros((len(self.x), len(self.x)))
+        self.x[0] = random.randint(0, len(self.x) - 1)
+        self.matrix[0][self.x[0]] = 1
+
+        for i in range(1, len(self.x)):
+            # None valore di Default per le variabili non ancora assegnate, quindi non creano conflitti, corrispondono
+            # a zeri nella matrice
+
+            self.x[i] = None
+
+            value = self.initialConflicts(i)
+            self.x[i] = value
+            self.matrix[i][value] = 1
+
+    def initialConflicts(self, i):
+        conflictsList = np.zeros(len(self.x))
+
+        for j in range(len(conflictsList)):
+
+            count = 0
+            count += countRowsConflicts(self.matrix, j, self.x, i)
+            count += countDiagonalConflicts(self.matrix, j, self.x, i)
+
+            conflictsList[j] = count
+
+        minValue = int(np.min(conflictsList))
+        minima = list()
+
+        for j in range(len(conflictsList)):
+            if conflictsList[j] == minValue:
+                minima.append(j)
+
+        return minima[random.randint(0, len(minima) - 1)]
+
+
+    def setX(self, x):
+        for i in range(self.n):
+            tmp = self.x[i]
+            self.x[i] = x[i]
+            self.matrix[i][tmp] = 0
+            self.matrix[i][self.x[i]] = 1
 
     def drawQueens(self):
         matrix = np.zeros((self.n, self.n))
@@ -75,26 +113,29 @@ class Problem:
 
 
 def minConflicts(problem, maxSteps):
-    current = problem.x
     for i in range(maxSteps):
-        if isSolution(current):
-            return current, i
-        var = chooseVar(current)
-        value = conflicts(current, var)
-        current[var] = value
+        if isSolution(problem):
+            return problem.x, i
+        var = chooseVar(problem.x)
+        value = conflicts(problem, var)
+        tmp = problem.x[var]
+        problem.x[var] = value
+        problem.matrix[var][tmp] = 0
+        problem.matrix[var][value] = 1
 
     return 0
 
 
 def minConflictsRandomRestart(problem, maxSteps, maxRestarts, count=0):
-    current = problem.x
-
     for i in range(maxSteps):
-        if isSolution(current):
-            return current, i, count
-        var = chooseVar(current)
-        value = conflicts(current, var)
-        current[var] = value
+        if isSolution(problem):
+            return problem.x, i, count
+        var = chooseVar(problem.x)
+        value = conflicts(problem, var)
+        tmp = problem.x[var]
+        problem.x[var] = value
+        problem.matrix[var][tmp] = 0
+        problem.matrix[var][value] = 1
 
     if count < maxRestarts:
         count += 1
@@ -107,18 +148,20 @@ def minConflictsRandomRestart(problem, maxSteps, maxRestarts, count=0):
 # Min conflicts accettando mosse svantaggiose all'inizio con probabilita' piu' alta, via via a decrescere
 
 def minConflictsSimulatedAnnealing(problem, maxSteps, temperature):
-    current = problem.x
     for i in range(maxSteps):
-        if isSolution(current):
-            return current, i
-        var = chooseVar(current)
+        if isSolution(problem):
+            return problem.x, i
+        var = chooseVar(problem.x)
 
-        if random.randint(0, (temperature + i)) == 0:
-            value = random.randint(0, len(current) - 1)
+        if random.randint(0, int(temperature + pow(i, 1)) == 0):
+            value = random.randint(0, len(problem.x) - 1)
         else:
-            value = conflicts(current, var)
+            value = conflicts(problem, var)
 
-        current[var] = value
+        tmp = problem.x[var]
+        problem.x[var] = value
+        problem.matrix[var][tmp] = 0
+        problem.matrix[var][value] = 1
 
     return 0
 
@@ -130,36 +173,30 @@ def isSolution(problem):
     # Verifica veloce per risparmiare tempo: se la somma degli indici di colonna e' diversa da n*(n+1)/2, dalla formula
     # di Gauss, allora non e' soluzione, altrimenti verifica
 
-    n = len(problem) - 1
+    n = len(problem.x) - 1
 
-    if sum(problem) != (n * (n + 1) / 2):
+    if sum(problem.x) != (n * (n + 1) / 2):
         return False
 
-    for i in range(len(problem)):
-        tmp = problem[i]
-        for j in range(i + 1, len(problem)):
-            if tmp is problem[j]:
+    for i in range(len(problem.x)):
+        tmp = problem.x[i]
+        for j in range(i + 1, len(problem.x)):
+            if tmp is problem.x[j]:
                 return False
-
-    # Adesso dobbiamo fare il test sulle diagonali, prima ritrasformo il problema in matrice
-
-    matrix = np.zeros((len(problem), len(problem)))
-    for i in range(len(problem)):
-        matrix[i][problem[i]] = 1
 
     # Analizzo ciascuna diagonale primaria e guardo che non ci siano due 1 in una diagonale
 
-    for k in range((len(matrix[0]) * 2) - 1):
-        diagonal = np.diagonal(matrix, k - (len(matrix[0]) - 1))
+    for k in range((len(problem.matrix[0]) * 2) - 1):
+        diagonal = np.diagonal(problem.matrix, k - (len(problem.matrix[0]) - 1))
         if sum(diagonal) > 1:
             return False
 
     # Analizzo ciascuna antidiagonale e guardo che non ci siano due 1 in una diagonale
 
-    matrix = np.fliplr(matrix)
+    flipMatrix = np.fliplr(problem.matrix)
 
-    for k in range((len(matrix[0]) * 2) - 1):
-        antidiagonal = np.diagonal(matrix, k - (len(matrix[0]) - 1))
+    for k in range((len(flipMatrix[0]) * 2) - 1):
+        antidiagonal = np.diagonal(flipMatrix, k - (len(flipMatrix[0]) - 1))
         if sum(antidiagonal) > 1:
             return False
 
@@ -172,27 +209,23 @@ def chooseVar(current):
     return random.randint(0, len(current) - 1)
 
 
-def conflicts(current, var):
+def conflicts(problem, var):
     # Data la lista delle variabili e quella da controllare, devo guardare il numero di conflitti per ogni assegnazione
     # eseguibile, in questo caso posso spostare le regine soltanto in orizzontale, scegliendo l'assegnazione di colonna
     # che provoca il minor numero di conflitti
 
-    conflictsList = np.zeros(len(current))
-
-    matrix = np.zeros((len(current), len(current)))
-    for i in range(len(current)):
-        matrix[i][current[i]] = 1
+    conflictsList = np.zeros(len(problem.x))
 
     for j in range(len(conflictsList)):
 
         count = 0
-        count += countRowsConflicts(matrix, j, current, var)
-        count += countDiagonalConflicts(matrix, j, current, var)
+        count += countRowsConflicts(problem.matrix, j, problem.x, var)
+        count += countDiagonalConflicts(problem.matrix, j, problem.x, var)
 
         # Se sto verificando un elemento che e' gia' assegnato, diagonale e antidiagonale l'hanno contato una volta in
         # piu'
 
-        if j is current[var]:
+        if j is problem.x[var]:
             count -= 2
 
         conflictsList[j] = count
