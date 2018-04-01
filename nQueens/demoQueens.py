@@ -1,7 +1,7 @@
 import nQueens as nq
 from timeit import default_timer as timer
 
-n = 8
+n = 512
 p = nq.Problem(n)
 p.setMinConflictsRandomX()
 #p.drawQueens()
@@ -15,8 +15,6 @@ print
 print "Running MinConflicts heuristic: "
 
 print
-
-
 
 # Min Conflicts
 
@@ -61,27 +59,5 @@ else:
     print p.getMatrix()
 
     #p.drawQueens()
-
-
-
-# Min Conflicts using Simulated Annealing
-
-
-steps = 100000
-temperature = 5
-
-start = timer()
-
-current = nq.minConflictsSimulatedAnnealing(p, steps, temperature)
-
-end = timer()
-
-if current is 0:
-    print "Solution not found in " + str(steps) + " steps, " + str(end - start) + " seconds"
-else:
-    print "I found a solution in " + str(current[1]) + " steps, " + str(end - start) + " seconds"
-    print
-    print p.getMatrix()
-
-    p.drawQueens()
+    
 '''
