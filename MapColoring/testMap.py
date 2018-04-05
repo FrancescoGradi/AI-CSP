@@ -3,8 +3,8 @@ import numpy as np
 from timeit import default_timer as timer
 import matplotlib.pyplot as plt
 
-n = [128, 256, 512, 1024]
-nColors = [5, 5, 5, 6, 6]
+n = [128, 256, 512, 1024, 2048, 4096]
+nColors = [5, 5, 5, 5, 5, 6, 6]
 k = 10
 steps = 100000
 
@@ -56,6 +56,7 @@ plt.plot(n, yTimeMax)
 plt.xlabel("Number of Regions")
 plt.ylabel("Time to resolve")
 plt.legend(["Min", "Avg", "Max"])
+plt.title("Map Coloring resolution time")
 plt.grid(True)
 plt.show()
 

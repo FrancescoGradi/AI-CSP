@@ -144,28 +144,6 @@ def minConflictsRandomRestart(problem, maxSteps, maxRestarts, count=0):
 
     return 0
 
-
-# Min conflicts accettando mosse svantaggiose all'inizio con probabilita' piu' alta, via via a decrescere
-
-def minConflictsSimulatedAnnealing(problem, maxSteps, temperature):
-    for i in range(maxSteps):
-        if isSolution(problem):
-            return problem.x, i
-        var = chooseVar(problem.x)
-
-        if random.randint(0, int(temperature + pow(i, 1)) == 0):
-            value = random.randint(0, len(problem.x) - 1)
-        else:
-            value = conflicts(problem, var)
-
-        tmp = problem.x[var]
-        problem.x[var] = value
-        problem.matrix[var][tmp] = 0
-        problem.matrix[var][value] = 1
-
-    return 0
-
-
 def isSolution(problem):
     # Dobbiamo verificare che tutte le colonne siano diverse, abbiano indici diversi
     # Per avere colonne tutte diverse non deve mai entrare nell'if

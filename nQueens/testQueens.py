@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 # Time test and step test in max 10000 steps with Min-Conflict with Assignment not random
 
-n = [8, 16, 24, 32, 48, 64, 96, 128]
+n = [8, 16, 20, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128]
 k = 10
 steps = 10000
 
@@ -18,6 +18,8 @@ yStepsAvg = list()
 yStepsMax = list()
 
 yNoSolutions = list()
+
+startTest = timer()
 
 for i in range(len(n)):
     yTimeTmp = list()
@@ -43,6 +45,8 @@ for i in range(len(n)):
         else:
             yStepsTmp.append(current[1])
 
+    print "Finished " + str(n[i]) + " queens"
+
     yTimeMin.append(min(yTimeTmp))
     yTimeAvg.append(np.average(yTimeTmp))
     yTimeMax.append(max(yTimeTmp))
@@ -50,6 +54,8 @@ for i in range(len(n)):
     yStepsMin.append(min(yStepsTmp))
     yStepsAvg.append(np.average(yStepsTmp))
     yStepsMax.append(max(yStepsTmp))
+
+endTest = timer()
 
 plt.plot(n, yTimeMin)
 plt.plot(n, yTimeAvg)
@@ -78,11 +84,21 @@ plt.title("Min-Conflicts with Conflict Initial Assignment")
 plt.grid(True)
 plt.show()
 
+print "Time test: " + str(endTest - startTest)
+
 print yTimeMin
 print
 print yTimeAvg
 print
 print yTimeMax
+print
+print yStepsMin
+print
+print yStepsAvg
+print
+print yStepsMax
+print
+print yNoSolutions
 
 '''
 
@@ -92,13 +108,11 @@ n = [8, 16, 24, 32, 64]
 k = 10
 steps = 10000
 
-yTimeMin = list()
 yTimeAvg = list()
-yTimeMax = list()
 
-yTimeRMin = list()
 yTimeRAvg = list()
-yTimeRMax = list()
+
+startTest = timer()
 
 for i in range(len(n)):
     yTimeTmp = list()
@@ -123,31 +137,20 @@ for i in range(len(n)):
 
         yTimeRTmp.append(end - start)
 
-    yTimeMin.append(min(yTimeTmp))
     yTimeAvg.append(np.average(yTimeTmp))
-    yTimeMax.append(max(yTimeTmp))
 
-    yTimeRMin.append(min(yTimeRTmp))
     yTimeRAvg.append(np.average(yTimeRTmp))
-    yTimeRMax.append(max(yTimeRTmp))
 
-plt.plot(n, yTimeMin)
+endTest = timer()
+
+print "Time test: " + str(endTest - startTest)
+
 plt.plot(n, yTimeAvg)
-plt.plot(n, yTimeMax)
-plt.xlabel("Number of Queens")
-plt.ylabel("Time to resolve in seconds")
-plt.legend(["Min", "Avg", "Max"])
-plt.title("Min-Conflicts with Conflict Initial Assignment")
-plt.grid(True)
-plt.show()
-
-plt.plot(n, yTimeRMin)
 plt.plot(n, yTimeRAvg)
-plt.plot(n, yTimeRMax)
 plt.xlabel("Number of Queens")
 plt.ylabel("Time to resolve in seconds")
-plt.legend(["Min", "Avg", "Max"])
-plt.title("Min-Conflicts with Random Initial Assignment")
+plt.legend(["Conflict Initial Assignment", "Random Initial Assignment"])
+plt.title("Min-Conflicts with Conflict Initial Assignment VS Random Initial Assignment")
 plt.grid(True)
 plt.show()
 

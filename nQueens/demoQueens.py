@@ -1,7 +1,7 @@
 import nQueens as nq
 from timeit import default_timer as timer
 
-n = 512
+n = 16
 p = nq.Problem(n)
 p.setMinConflictsRandomX()
 #p.drawQueens()
@@ -35,7 +35,7 @@ else:
     print
     print p.getMatrix()
 
-    #p.drawQueens()
+    p.drawQueens()
 
 '''
 

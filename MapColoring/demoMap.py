@@ -9,11 +9,16 @@ from timeit import default_timer as timer
 
 map = mp.getAustraliaMap()
 
+start = timer()
 solution = mp.minConflicts(map, 10000)
+end = timer()
 
 if solution is 0:
-    print "Solution not found"
+    print "Solution not found in " + str(end - start) + " seconds"
 else:
+    print
+    print "I found a solution in " + str(end - start) + " seconds and " + str(solution[1]) + " with " + \
+        str(len(map.domains)) + " colors"
     for i in range(len(solution[0].regions)):
         print solution[0].regions[i].name + ": " + str(solution[0].regions[i].color)
 
@@ -24,7 +29,7 @@ else:
 # In questo caso si ottiene un grafo casuale di n nodi con nColors, generato in modo che gli archi non si intersechino
 # tramite l'algoritmo di Delaunay. In questo esempio il numero di colori parte da
 
-n = 1024
+n = 512
 nColors = 2
 steps = 100000
 

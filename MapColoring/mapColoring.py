@@ -52,8 +52,8 @@ class Map:
                 if node is colorsRegions[i][0]:
                     colors.append(colorsRegions[i][1])
 
-        nx.draw_networkx_nodes(g, pos, node_color=colors, node_size=1000)
-        nx.draw_networkx_labels(g, pos, font_size=14)
+        nx.draw_networkx_nodes(g, pos, node_color=colors, node_size=800)
+        nx.draw_networkx_labels(g, pos, font_size=12)
         nx.draw_networkx_edges(g, pos)
 
         plt.show()
